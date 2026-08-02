@@ -1,0 +1,14 @@
+# Ozean-Theme
+font=JetBrainsMono Nerd Font 11
+background-color=#0b1d2eeb
+text-color=#e8f1f8
+border-color=#7fb4d9
+border-size=2
+padding=10
+margin=10
+default-timeout=4000
+anchor=top-right
+
+[urgency=critical]
+border-color=#e06c75
+default-timeout=0

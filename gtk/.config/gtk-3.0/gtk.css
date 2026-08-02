@@ -1,0 +1,66 @@
+/* ===== Ozean-Override für Arc-Dark ===== */
+
+/* Grundflächen */
+window, .background {
+    background-color: #0f2438;
+    color: #e8f1f8;
+}
+
+/* Inhaltsflächen: Dateiliste, Icon-Ansicht, Textfelder */
+.view, iconview, treeview.view, textview text, list {
+    background-color: #0b1d2e;
+    color: #e8f1f8;
+}
+
+/* Auswahl / Markierung */
+.view:selected, .view:selected:focus,
+treeview.view:selected, iconview:selected,
+row:selected, *:selected {
+    background-color: #7fb4d9;
+    color: #0b1d2e;
+}
+
+/* Thunar-Sidebar */
+.sidebar, placessidebar, placessidebar list {
+    background-color: #0f2438;
+    color: #e8f1f8;
+}
+
+/* Kopfleiste / Toolbar / Pfadleiste */
+headerbar, .titlebar, toolbar {
+    background-color: #0b1d2e;
+    color: #e8f1f8;
+    border-color: #1b3a57;
+}
+
+/* Buttons */
+button {
+    background-image: none;
+    background-color: #1b3a57;
+    color: #e8f1f8;
+    border-color: #0b1d2e;
+}
+button:hover { background-color: #2a4a6b; }
+button:checked, button:active { background-color: #7fb4d9; color: #0b1d2e; }
+
+/* Eingabefelder (z. B. Pfad-/Suchleiste) */
+entry {
+    background-color: #0b1d2e;
+    color: #e8f1f8;
+    border-color: #1b3a57;
+}
+entry:focus { border-color: #7fb4d9; }
+
+/* Menüs & Popover */
+menu, .menu, popover, popover.background {
+    background-color: #0f2438;
+    color: #e8f1f8;
+}
+menuitem:hover { background-color: #7fb4d9; color: #0b1d2e; }
+
+/* Scrollbalken */
+scrollbar slider { background-color: #1b3a57; }
+scrollbar slider:hover { background-color: #7fb4d9; }
+
+/* Tooltips */
+tooltip, tooltip.background { background-color: #0b1d2e; color: #e8f1f8; }

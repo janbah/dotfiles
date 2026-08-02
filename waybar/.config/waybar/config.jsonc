@@ -1,0 +1,76 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+    "spacing": 0,
+
+    "modules-left": ["sway/workspaces"],
+    "modules-center": ["clock"],
+    "modules-right": ["tray", "bluetooth", "backlight", "custom/gammastep", "pulseaudio", "network", "battery", "custom/power"],
+
+    "sway/workspaces": {
+        "disable-scroll": false,
+        "format": "{name}"
+    },
+
+    "custom/power": {
+        "format": "⏻",
+        "on-click": "~/.local/bin/powermenu",
+        "tooltip": false
+    },
+
+    "tray": {
+        "icon-size": 16,
+        "spacing": 8
+    },
+
+    "clock": {
+        "format": "{:%H:%M}",
+        "format-alt": "{:%a, %d. %b %Y}",
+        "tooltip-format": "<tt>{calendar}</tt>"
+    },
+
+    "backlight": {
+        "format": "󰃟 {percent}%",
+        "tooltip": false
+    },
+
+    "pulseaudio": {
+        "format": "󰕾 {volume}%",
+        "format-muted": "󰝟 mute",
+        "on-click": "pavucontrol",
+        "tooltip": false
+    },
+
+    "network": {
+        "format-wifi": "󰖩 {essid}",
+        "format-ethernet": "󰈀 wired",
+        "format-disconnected": "󰖪 offline",
+	"on-click": "~/.local/bin/wifimenu",
+        "tooltip-format-wifi": "{essid} ({signalStrength}%) – {ipaddr}"
+    },
+
+    "battery": {
+        "states": { "warning": 25, "critical": 10 },
+        "format": "{icon} {capacity}%",
+        "format-charging": "󰂄 {capacity}%",
+        "format-icons": ["󰁺", "󰁼", "󰁾", "󰂀", "󰁹"],
+        "tooltip-format": "{timeTo}"
+    },
+
+    "bluetooth": {
+        "format": "󰂯",
+        "format-connected": "󰂱 {device_alias}",
+        "format-disabled": "󰂲",
+        "on-click": "~/.local/bin/btmenu",
+        "tooltip-format": "{status}"
+    },
+
+    "custom/gammastep": {
+        "exec": "~/.local/bin/gammastep-toggle status",
+        "return-type": "json",
+        "interval": 30,
+        "signal": 8,
+        "on-click": "~/.local/bin/gammastep-toggle menu"
+    },
+}
