@@ -31,9 +31,21 @@ NetworkManager "unmanaged"). Nur lo-Zeilen bleiben aktiv.
 
 ### 3. Repo holen und installieren
 
+Das Repo ist privat. Auf einem frischen Debian gibt es aber noch keinen
+Browser fuer die GitHub-Anmeldung (gh/Token) und auch noch keinen SSH-Key.
+Einfachster Weg fuer den Erst-Klon: das Repo auf GitHub kurz auf **public**
+stellen (Repo -> Settings -> Danger Zone -> Change visibility -> Make public),
+dann klonen. Nach der Installation wieder auf **private** schalten.
+
     sudo apt update && sudo apt install -y git
     git clone https://github.com/janbah/dotfiles.git ~/dotfiles
     ~/dotfiles/install.sh
+
+Achtung Reihenfolge: erst public schalten, DANN klonen — sonst laeuft der
+Klon in eine Auth-Abfrage. Nach install.sh (Browser ist jetzt da) das Repo
+wieder auf **private** setzen und die Git-Anmeldung einrichten (siehe
+"Nacharbeiten"). Hinweis: Waehrend des public-Fensters sind Commit-Mail und
+Gammastep-Koordinaten oeffentlich sichtbar.
 
 ### 4. Neu starten
 Nach Reboot: LUKS-Passphrase -> tty-Login -> Sway startet automatisch
@@ -50,6 +62,10 @@ Key aus dem Backup zurueckspielen (nicht neu erzeugen):
     chmod 600 ~/.ssh/id_ed25519 && chmod 644 ~/.ssh/id_ed25519.pub
 
     git -C ~/dotfiles remote set-url origin git@github.com:janbah/dotfiles.git
+
+Alternativ ohne SSH-Key, per Browser-Login (Passwort + OTP): `sudo apt install gh`
+und `gh auth login` (GitHub.com -> HTTPS -> im Browser bestaetigen). Richtet die
+HTTPS-Anmeldung fuers private Repo ein; die Remote kann dann auf https bleiben.
 
 **Keyring automatisch entsperren (PAM):** In /etc/pam.d/login ergaenzen —
 unter den auth-Zeilen:

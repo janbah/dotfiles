@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# WLAN-Menü über fuzzel — v3
+
+FUZZEL_ARGS=(--anchor=top-right --x-margin=10 --y-margin=10 --width=52 --font="JetBrainsMono Nerd Font:size=11")
+
+notify-send -t 1500 "WLAN" "Scanne nach Netzwerken…"
+nmcli device wifi rescan 2>/dev/null
+sleep 0.5
+
+declare -a ssids secs displays
+menu=""
+while IFS= read -r line; do
+    inuse=${line%%:*}; rest=${line#*:}
+    sig=${rest%%:*};   rest=${rest#*:}
+    sec=${rest%%:*};   ssid=${rest#*:}
+    ssid=${ssid//\\:/:}
+    [ -z "$ssid" ] && continue
+    marker="  "
+    [ "$inuse" = "*" ] && marker="✓ "
+    display=$(printf '%s%-30s %3s%%  %s' "$marker" "$ssid" "$sig" "${sec:---}")
+    menu+="$display"$'\n'
+    ssids+=("$ssid")
+    secs+=("$sec")
+    displays+=("$display")
+done < <(nmcli -t -f IN-USE,SIGNAL,SECURITY,SSID device wifi list)
+
+if [ -z "$menu" ]; then
+    notify-send -u critical "WLAN" "Keine Netzwerke gefunden"
+    exit 1
+fi
+
+nlines=$(printf '%s' "$menu" | grep -c .)
+[ "$nlines" -gt 12 ] && nlines=12
+
+chosen=$(printf '%s' "$menu" | fuzzel -d "${FUZZEL_ARGS[@]}" --lines="$nlines" -p "WLAN ❯ ")
+[ -z "$chosen" ] && exit 0
+
+ssid=""
+sec=""
+for i in "${!displays[@]}"; do
+    if [ "${displays[$i]}" = "$chosen" ]; then
+        ssid="${ssids[$i]}"
+        sec="${secs[$i]}"
+        break
+    fi
+done
+[ -z "$ssid" ] && exit 1
+
+if nmcli -t -f NAME connection show | grep -Fxq "$ssid"; then
+    if nmcli connection up "$ssid" >/dev/null 2>&1; then
+        notify-send "WLAN" "Verbunden mit $ssid"
+    else
+        notify-send -u critical "WLAN" "Verbindung zu $ssid fehlgeschlagen"
+    fi
+    exit 0
+fi
+
+if [ -n "$sec" ] && [ "$sec" != "--" ]; then
+    pass=$(printf '' | fuzzel -d "${FUZZEL_ARGS[@]}" --lines=0 --password -p "Passwort für $ssid ❯ ")
+    [ -z "$pass" ] && exit 0
+    if nmcli device wifi connect "$ssid" password "$pass" >/dev/null 2>&1; then
+        notify-send "WLAN" "Verbunden mit $ssid"
+    else
+        notify-send -u critical "WLAN" "Verbindung fehlgeschlagen (Passwort falsch?)"
+    fi
+else
+    if nmcli device wifi connect "$ssid" >/dev/null 2>&1; then
+        notify-send "WLAN" "Verbunden mit $ssid"
+    else
+        notify-send -u critical "WLAN" "Verbindung zu $ssid fehlgeschlagen"
+    fi
+fi

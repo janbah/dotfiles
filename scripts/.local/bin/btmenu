@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# Bluetooth-Menü über fuzzel — v3
+
+FUZZEL_ARGS=(--anchor=top-right --x-margin=10 --y-margin=10 --width=42 --font="JetBrainsMono Nerd Font:size=11")
+
+if bluetoothctl show | grep -q "Powered: yes"; then
+    powered=yes
+    toggle_label="󰂲  Bluetooth ausschalten"
+else
+    powered=no
+    toggle_label="󰂯  Bluetooth einschalten"
+fi
+
+pair_label="󰂰  Neues Gerät koppeln"
+
+menu="$toggle_label"$'\n'"$pair_label"$'\n'
+
+declare -a macs displays states
+if [ "$powered" = "yes" ]; then
+    while IFS= read -r line; do
+        mac=$(echo "$line" | awk '{print $2}')
+        name=$(echo "$line" | cut -d' ' -f3-)
+        [ -z "$name" ] && continue
+        if bluetoothctl info "$mac" 2>/dev/null | grep -q "Connected: yes"; then
+            state="verbunden"
+            display="󰂱  $name  [verbunden]"
+        else
+            state="getrennt"
+            display="   $name"
+        fi
+        menu+="$display"$'\n'
+        macs+=("$mac")
+        displays+=("$display")
+        states+=("$state")
+    done < <(bluetoothctl devices)
+fi
+
+nlines=$(printf '%s' "$menu" | grep -c .)
+[ "$nlines" -gt 10 ] && nlines=10
+
+chosen=$(printf '%s' "$menu" | fuzzel -d "${FUZZEL_ARGS[@]}" --lines="$nlines" -p "BT ❯ ")
+[ -z "$chosen" ] && exit 0
+
+if [ "$chosen" = "$toggle_label" ]; then
+    if [ "$powered" = "yes" ]; then
+        bluetoothctl power off >/dev/null && notify-send "Bluetooth" "Ausgeschaltet"
+    else
+        bluetoothctl power on >/dev/null && notify-send "Bluetooth" "Eingeschaltet"
+    fi
+    exit 0
+fi
+
+if [ "$chosen" = "$pair_label" ]; then
+    bluetoothctl power on >/dev/null 2>&1
+    exec kitty --class floating_shell -e bash -c '
+        echo "=== Bluetooth-Kopplung ==="
+        echo "Gefundene Geraete erscheinen gleich in der Liste."
+        echo "Koppeln mit:   pair XX:XX:XX:XX:XX:XX"
+        echo "Danach:        trust XX:...  und  connect XX:..."
+        echo "Beenden mit:   exit"
+        echo "=========================="
+        bluetoothctl -- scan on &
+        sleep 1
+        exec bluetoothctl'
+fi
+
+for i in "${!displays[@]}"; do
+    if [ "${displays[$i]}" = "$chosen" ]; then
+        mac="${macs[$i]}"
+        if [ "${states[$i]}" = "verbunden" ]; then
+            bluetoothctl disconnect "$mac" >/dev/null && notify-send "Bluetooth" "Getrennt"
+        else
+            if bluetoothctl connect "$mac" >/dev/null 2>&1; then
+                notify-send "Bluetooth" "Verbunden"
+            else
+                notify-send -u critical "Bluetooth" "Verbindung fehlgeschlagen"
+            fi
+        fi
+        exit 0
+    fi
+done

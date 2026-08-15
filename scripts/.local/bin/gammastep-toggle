@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Gammastep-Steuerung: Status für Waybar + fuzzel-Menü
+LOC="51.4:6.8"
+STATE="$HOME/.cache/gammastep-mode"
+FUZZEL_ARGS=(--anchor=top-right --x-margin=10 --y-margin=10 --width=34 --font="JetBrainsMono Nerd Font:size=11")
+
+refresh() { pkill -RTMIN+8 waybar; }
+
+start_auto() {
+    pkill -x gammastep; sleep 0.3
+    setsid gammastep -l "$LOC" >/dev/null 2>&1 &
+    echo "Automatik" > "$STATE"
+}
+start_temp() {
+    pkill -x gammastep; sleep 0.3
+    setsid gammastep -l "$LOC" -t "$1:$1" >/dev/null 2>&1 &
+    echo "${1}K" > "$STATE"
+}
+stop() {
+    pkill -x gammastep
+    echo "aus" > "$STATE"
+}
+
+case "$1" in
+  status)
+    if pgrep -x gammastep >/dev/null; then
+      mode=$(cat "$STATE" 2>/dev/null || echo "Automatik")
+      echo "{\"text\": \"󰖔\", \"tooltip\": \"Nachtlicht: $mode\", \"class\": \"on\"}"
+    else
+      echo '{"text": "󰖨", "tooltip": "Nachtlicht aus", "class": "off"}'
+    fi
+    ;;
+  menu)
+    a="󰖔  Automatik (Sonnenstand)"
+    b="   Leicht warm (5500K)"
+    c="   Warm (4500K)"
+    d="   Sehr warm (3600K)"
+    e="󰖨  Aus (neutral)"
+    chosen=$(printf '%s\n%s\n%s\n%s\n%s\n' "$a" "$b" "$c" "$d" "$e" | \
+        fuzzel -d "${FUZZEL_ARGS[@]}" --lines=5 -p "󰖔 ❯ ")
+    case "$chosen" in
+      "$a") start_auto ;;
+      "$b") start_temp 5500 ;;
+      "$c") start_temp 4500 ;;
+      "$d") start_temp 3600 ;;
+      "$e") stop ;;
+    esac
+    refresh
+    ;;
+esac

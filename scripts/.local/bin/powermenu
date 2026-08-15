@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Power-Menü über fuzzel
+
+FUZZEL_ARGS=(--anchor=top-right --x-margin=10 --y-margin=10 --width=26 --font="JetBrainsMono Nerd Font:size=11")
+
+lock="󰌾  Sperren"
+susp="󰤄  Standby"
+lout="󰗽  Abmelden"
+rebt="󰜉  Neustart"
+shut="⏻  Herunterfahren"
+
+chosen=$(printf '%s\n%s\n%s\n%s\n%s\n' "$lock" "$susp" "$lout" "$rebt" "$shut" | \
+    fuzzel -d "${FUZZEL_ARGS[@]}" --lines=5 -p "⏻ ❯ ")
+
+case "$chosen" in
+    "$lock") swaylock -f -i ~/Pictures/ocean_with_cloud.png ;;
+    "$susp") systemctl suspend ;;
+    "$lout") swaymsg exit ;;
+    "$rebt") systemctl reboot ;;
+    "$shut") systemctl poweroff ;;
+esac
