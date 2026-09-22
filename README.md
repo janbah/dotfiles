@@ -79,6 +79,8 @@ ans Ende der session-Zeilen:
 (Voraussetzung: Keyring-Passwort = Login-Passwort.)
 
 **Konten & Daten:**
+- Tailscale (via install.sh installiert) anmelden: `sudo tailscale up`
+  (oeffnet einen Login-Link im Browser); danach laeuft es als Dienst automatisch
 - Nextcloud-Konto verbinden; Ordner-Sync `Obsidian` (Server) ->
   `~/Documents/Obsidian` (lokal) als eigene Sync-Verbindung anlegen
 - Thunderbird-Konten einrichten
@@ -88,10 +90,39 @@ ans Ende der session-Zeilen:
   Akzent #7fb4d9
 
 **Weitere Software (Fremdquellen mit beweglichen URLs):**
+- JetBrains Rider: NICHT als Flatpak (Sandbox findet das System-.NET-SDK nicht),
+  sondern via JetBrains Toolbox. Toolbox-`.tar.gz` von
+  https://www.jetbrains.com/toolbox-app/ herunterladen, entpacken, starten und
+  darin Rider installieren. Toolbox haelt Rider aktuell (nicht ueber apt).
 - Proton VPN: Repo-Paket von https://protonvpn.com/support/linux
   herunterladen, dann `sudo apt install proton-vpn-gnome-desktop`
 - Claude Code: Installation laut https://docs.claude.com
-- Claude Desktop: QUELLE HIER EINTRAGEN (TODO)
+- Claude Desktop (Linux-Beta, offizielles Anthropic-apt-Repo; Debian 12+ wird
+  unterstuetzt, Debian 13 passt). Doku: https://code.claude.com/docs/en/desktop-linux
+
+      sudo apt install curl gnupg
+      sudo curl -fsSLo /usr/share/keyrings/claude-desktop-archive-keyring.asc https://downloads.claude.ai/claude-desktop/key.asc
+      gpg --show-keys /usr/share/keyrings/claude-desktop-archive-keyring.asc   # Fingerprint muss 31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE sein
+      echo "deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/claude-desktop-archive-keyring.asc] https://downloads.claude.ai/claude-desktop/apt/stable stable main" | sudo tee /etc/apt/sources.list.d/claude-desktop.list
+      sudo apt update && sudo apt install claude-desktop
+
+  Updates kommen ueber das normale `apt upgrade` (kein eigener Updater). Start
+  ueber den App-Launcher oder `claude-desktop`, Anmeldung mit Anthropic-Konto.
+- Google Chat: kein nativer Linux-Client (von Google 2021 eingestellt). Als PWA
+  einrichten: `chat.google.com` in Chrome/Chromium oeffnen -> in der Adressleiste
+  auf das Installieren-Symbol klicken. Ergibt eigenes Fenster + Benachrichtigungen
+  + Tray. (Nicht skriptbar, daher hier statt in install.sh.)
+
+**.NET-Entwicklung (SDK 10 kommt via install.sh, Microsoft-Feed):**
+- HTTPS-Dev-Zertifikat einmalig anlegen und vertrauen:
+  `dotnet dev-certs https --trust`
+- EF-Core-Tools pro Nutzer (landet in `~/.dotnet/tools`, nicht in apt):
+  `dotnet tool install --global dotnet-ef`
+  Dazu `~/.dotnet/tools` in den PATH aufnehmen (falls nicht schon vorhanden).
+- Docker (via install.sh, Debian-Repo `docker.io` + `docker-compose-v2`): der
+  Nutzer wird in die `docker`-Gruppe aufgenommen. Damit `docker` ohne sudo
+  laeuft, einmal **ab- und wieder anmelden** (Gruppe wird erst dann aktiv).
+  Test: `docker run --rm hello-world`.
 
 **Firmware pruefen:**
 

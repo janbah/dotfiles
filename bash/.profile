@@ -28,5 +28,6 @@ fi
 
 if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
     export XDG_CURRENT_DESKTOP=sway
-    exec sway
+    # --unsupported-gpu: nötig für NVIDIA (nvidia-drm modeset=1); schadet Intel/AMD nicht
+    exec sway --unsupported-gpu
 fi

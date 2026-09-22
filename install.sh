@@ -28,11 +28,45 @@ fi
 sudo apt update
 sudo apt install -y code
 
+echo "==> .NET SDK 10 (Microsoft-Feed)"
+if ! dpkg -l dotnet-sdk-10.0 >/dev/null 2>&1; then
+  wget -qO /tmp/ms-prod.deb https://packages.microsoft.com/config/debian/13/packages-microsoft-prod.deb
+  sudo dpkg -i /tmp/ms-prod.deb
+  rm /tmp/ms-prod.deb
+  sudo apt update
+  sudo apt install -y dotnet-sdk-10.0
+fi
+
+echo "==> Docker (Debian-Repo)"
+sudo apt install -y docker.io docker-compose-v2
+sudo systemctl enable --now docker
+# Nutzer in docker-Gruppe -> docker ohne sudo (erst nach Neu-Login wirksam)
+sudo usermod -aG docker "$USER"
+
+echo "==> Tailscale (offizielles apt-Repo, Debian 13 = trixie)"
+if [ ! -f /usr/share/keyrings/tailscale-archive-keyring.gpg ]; then
+  sudo mkdir -p --mode=0755 /usr/share/keyrings
+  curl -fsSL https://pkgs.tailscale.com/stable/debian/trixie.noarmor.gpg | sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg > /dev/null
+fi
+if [ ! -f /etc/apt/sources.list.d/tailscale.list ]; then
+  curl -fsSL https://pkgs.tailscale.com/stable/debian/trixie.tailscale-keyring.list | sudo tee /etc/apt/sources.list.d/tailscale.list > /dev/null
+fi
+sudo apt update
+sudo apt install -y tailscale
+# Anmeldung erst danach manuell (interaktiv): sudo tailscale up  (siehe README)
+
 echo "==> Google Chrome"
 if ! dpkg -l google-chrome-stable >/dev/null 2>&1; then
   wget -qO /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
   sudo apt install -y /tmp/chrome.deb
   rm /tmp/chrome.deb
+fi
+
+echo "==> GitKraken (offizielles .deb)"
+if ! dpkg -l gitkraken >/dev/null 2>&1; then
+  wget -qO /tmp/gitkraken.deb https://release.gitkraken.com/linux/gitkraken-amd64.deb
+  sudo apt install -y /tmp/gitkraken.deb
+  rm /tmp/gitkraken.deb
 fi
 
 echo "==> Nerd Font"
@@ -51,7 +85,7 @@ echo "==> Anwendungen (apt)"
 sudo apt install -y thunderbird keepassxc
 
 echo "==> Anwendungen (Flatpak)"
-flatpak install -y flathub md.obsidian.Obsidian com.nextcloud.desktopclient.nextcloud net.ankiweb.Anki com.slack.Slack
+flatpak install -y flathub md.obsidian.Obsidian com.nextcloud.desktopclient.nextcloud net.ankiweb.Anki com.slack.Slack com.usebruno.Bruno
 
 echo "==> GTK-Theme"
 gsettings set org.gnome.desktop.interface gtk-theme "Arc-Dark"
