@@ -38,7 +38,7 @@ if ! dpkg -l dotnet-sdk-10.0 >/dev/null 2>&1; then
 fi
 
 echo "==> Docker (Debian-Repo)"
-sudo apt install -y docker.io docker-compose-v2
+sudo apt install -y docker.io docker-compose
 sudo systemctl enable --now docker
 # Nutzer in docker-Gruppe -> docker ohne sudo (erst nach Neu-Login wirksam)
 sudo usermod -aG docker "$USER"

@@ -26,6 +26,9 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
+# SSH-Agent (systemd ssh-agent.socket) – muss vor "exec sway" stehen
+export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/openssh_agent"
+
 if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
     export XDG_CURRENT_DESKTOP=sway
     # --unsupported-gpu: nötig für NVIDIA (nvidia-drm modeset=1); schadet Intel/AMD nicht
