@@ -1,0 +1,2 @@
+# Plugins werden per "ya pkg install" aus package.toml geholt
+plugins/

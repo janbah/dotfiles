@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Installiert/aktualisiert yazi (nicht in Debian) aus dem neuesten
+# GitHub-Release nach ~/.local/bin. Einfach erneut ausführen zum Updaten.
+set -euo pipefail
+name=yazi-x86_64-unknown-linux-gnu
+tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+curl -fsSL -o "$tmp/yazi.zip" "https://github.com/sxyazi/yazi/releases/latest/download/$name.zip"
+unzip -q "$tmp/yazi.zip" -d "$tmp"
+install -m 755 "$tmp/$name/yazi" "$tmp/$name/ya" "$HOME/.local/bin/"
+"$HOME/.local/bin/yazi" --version
