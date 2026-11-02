@@ -10,6 +10,8 @@ focus_follows_mouse no
 input type:keyboard {
     xkb_layout de
     xkb_variant nodeadkeys
+    # Caps Lock als Escape (Shift+Caps = Caps Lock)
+    xkb_options caps:escape_shifted_capslock
 }
 input type:touchpad {
     tap enabled
@@ -18,13 +20,17 @@ input type:touchpad {
 
 ### Ausgabe / Wallpaper (ersetzt feh) ###
 output * bg ~/Pictures/ocean_with_cloud.png fill
+# Anordnung/Auflösung der Monitore macht kanshi (~/.config/kanshi/config)
 
 ### Autostart ###
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 exec gammastep -l 51.4:6.8
 exec mako
+exec kanshi
 exec flatpak run com.nextcloud.desktopclient.nextcloud --background
 exec /usr/lib/mate-polkit/polkit-mate-authentication-agent-1
+# Zwischenablage-Verlauf mitschreiben (Auswahl: $mod+c)
+exec wl-paste --watch cliphist store
 # Sperren bei Inaktivität (10 min) und vor Suspend (ersetzt xss-lock)
 exec swayidle -w \
     timeout 600 'swaylock -f -i ~/Pictures/ocean_with_cloud.png' \
@@ -44,6 +50,8 @@ floating_modifier $mod
 bindsym $mod+Return exec kitty
 bindsym $mod+q kill
 bindsym $mod+d exec fuzzel
+# Zwischenablage-Verlauf: Eintrag wählen -> wieder in die Zwischenablage
+bindsym $mod+c exec cliphist list | fuzzel --dmenu | cliphist decode | wl-copy
 for_window [app_id="floating_shell"] floating enable
 
 # Fokus
