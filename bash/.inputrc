@@ -1,0 +1,38 @@
+# Systemweite Defaults von Debian übernehmen
+$include /etc/inputrc
+
+# ===== Vim-Modus =====
+set editing-mode vi
+# Esc reagiert sofort (Standard wartet 500 ms)
+set keyseq-timeout 50
+# Modus über die Cursorform anzeigen: Strich = Einfügen, Block = Normalmodus
+set show-mode-in-prompt on
+set vi-ins-mode-string "\1\e[6 q\2"
+set vi-cmd-mode-string "\1\e[2 q\2"
+
+# ===== Bessere Autovervollständigung =====
+set completion-ignore-case on          # Groß-/Kleinschreibung egal
+set completion-map-case on             # - und _ gleich behandeln
+set show-all-if-ambiguous on           # Liste sofort beim ersten Tab
+set menu-complete-display-prefix on    # erst gemeinsamen Teil ergänzen, dann durchschalten
+set colored-stats on                   # Farben wie bei ls
+set colored-completion-prefix on       # schon getippten Teil hervorheben
+set visible-stats on                   # / hinter Ordnern, * hinter Programmen
+set mark-symlinked-directories on
+set skip-completed-text on
+
+# ===== Tasten im Einfügemodus =====
+set keymap vi-insert
+TAB: menu-complete                     # Tab schaltet durch die Vorschläge
+"\e[Z": menu-complete-backward         # Umschalt+Tab rückwärts
+"\e[A": history-search-backward        # Pfeil hoch: Verlauf mit getipptem Anfang
+"\e[B": history-search-forward
+"\C-a": beginning-of-line              # Gewohnte Kürzel behalten
+"\C-e": end-of-line
+"\C-l": clear-screen
+"\e.": yank-last-arg                   # Alt+. = letztes Argument des vorigen Befehls
+
+# ===== Tasten im Normalmodus =====
+set keymap vi-command
+"\e[A": history-search-backward
+"\e[B": history-search-forward
