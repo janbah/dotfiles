@@ -12,7 +12,8 @@ sudo apt install -y sway swaylock swayidle swaybg waybar fuzzel kitty \
   fonts-noto-color-emoji thunar udiskie mate-polkit polkitd xdg-user-dirs \
   bluez gammastep firefox-esr flatpak unzip stow git \
   unattended-upgrades intel-microcode fwupd \
-  bat btop htop fzf fd-find ripgrep jq tmux tree curl wget zip \
+  bat btop htop fzf fd-find eza zoxide direnv vim cliphist kanshi wdisplays lazygit \
+  glow ffmpegthumbnailer imagemagick ripgrep jq tmux tree curl wget zip \
   build-essential thunar-archive-plugin tumbler xdg-desktop-portal-gtk gpg \
   libpam-gnome-keyring gnome-keyring \
   arc-theme breeze-icon-theme fonts-inter v4l-utils lsof memtester \
@@ -97,10 +98,17 @@ echo "==> Unattended Upgrades aktivieren"
 printf 'APT::Periodic::Update-Package-Lists "1";\nAPT::Periodic::Unattended-Upgrade "1";\n' | sudo tee /etc/apt/apt.conf.d/20auto-upgrades >/dev/null
 
 echo "==> Vorhandene Dateien sichern, Symlinks setzen"
-for f in "$HOME/.bashrc" "$HOME/.profile"; do
+for f in "$HOME/.bashrc" "$HOME/.profile" "$HOME/.inputrc"; do
   [ -f "$f" ] && [ ! -L "$f" ] && mv "$f" "$f.bak"
 done
-stow sway waybar kitty fuzzel mako scripts bash wallpapers gtk
+# Als echter Ordner anlegen, sonst verlinkt stow ihn komplett ins Repo und
+# alles, was später dorthin installiert wird, landet im Repo
+mkdir -p "$HOME/.local/bin"
+stow sway kanshi waybar kitty fuzzel mako scripts bash yazi wallpapers gtk
 xdg-user-dirs-update
+
+echo "==> yazi (nicht in Debian) aus GitHub-Release + Plugins"
+"$HOME/.local/bin/update-yazi"
+"$HOME/.local/bin/ya" pkg install
 
 echo "==> Fertig. Abmelden und neu einloggen."
