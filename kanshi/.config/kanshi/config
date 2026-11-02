@@ -1,0 +1,28 @@
+# Monitore über Make/Model/Serial ansprechen – DP-Namen wechseln je nach Port/Dock
+# (kanshi 1.5 in Debian kennt noch keine Aliase, daher ausgeschrieben)
+
+# Büro: Laptop · Samsung · Fujitsu
+profile buero {
+  output eDP-1 enable position 0,0
+  output "Samsung Electric Company S27C650 HTQD600046" enable mode 1920x1080@60Hz position 1920,0
+  output "Fujitsu Siemens Computers GmbH P27T-7 LED YV6F019971" enable mode 1920x1080@60Hz position 3840,0
+}
+
+# Unterwegs
+profile laptop {
+  output eDP-1 enable position 0,0
+}
+
+# --- Fallback (muss am Ende bleiben, erstes passendes Profil gewinnt) ---
+# Unbekannte Monitore: Laptop links, Externe rechts daneben (sway reiht sie auf)
+# Feste Profile für neue Setups: einrichten (z.B. wdisplays), dann `kanshi-save <name>`
+profile fallback-1 {
+  output eDP-1 enable position 0,0
+  output * enable
+}
+
+profile fallback-2 {
+  output eDP-1 enable position 0,0
+  output * enable
+  output * enable
+}

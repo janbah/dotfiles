@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Aktuelle Monitor-Anordnung als kanshi-Profil speichern (vor den Fallback-Profilen)
+set -eo pipefail
+# Über den stow-Symlink landet die Änderung im dotfiles-Repo
+CONF="${KANSHI_CONF:-$HOME/.config/kanshi/config}"
+MARKER="# --- Fallback"
+
+name="$1"
+[ -z "$name" ] && { echo "Usage: kanshi-save <profilname>"; exit 1; }
+grep -q "^profile $name {" "$CONF" && { echo "Profil '$name' gibt es schon in $CONF"; exit 1; }
+
+block=$(swaymsg -t get_outputs -r | jq -r --arg name "$name" '
+  "# gespeichert mit kanshi-save",
+  "profile \($name) {",
+  (.[] |
+    # Laptop-Panel über den Port, alles andere über Make/Model/Serial
+    (if (.name | startswith("eDP")) then .name else "\"\(.make) \(.model) \(.serial)\"" end) as $id |
+    if .active then
+      "  output \($id) enable mode \(.current_mode.width)x\(.current_mode.height)@\(.current_mode.refresh / 1000)Hz position \(.rect.x),\(.rect.y) scale \(.scale) transform \(.transform)"
+    else
+      "  output \($id) disable"
+    end),
+  "}", ""')
+
+python3 - "$CONF" "$MARKER" "$block" <<'PY'
+import sys
+conf, marker, block = sys.argv[1:]
+s = open(conf).read()
+i = s.find(marker)
+s = s[:i] + block + "\n" + s[i:] if i >= 0 else s.rstrip("\n") + "\n\n" + block
+open(conf, "w").write(s)
+PY
+
+echo "$block"
+pkill -HUP -x kanshi && echo "kanshi neu geladen" || echo "kanshi läuft nicht – mit 'swaymsg exec kanshi' starten"
